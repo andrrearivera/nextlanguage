@@ -23,7 +23,7 @@ csrf = CSRFProtect(app)
 # and the database username is the default, 'root'
 # change if necessary
 username = 'andreari_kimchi'
-password = 'LoserLover1004'
+password = ''
 userpass = 'mysql+pymysql://' + username + ':' + password + '@'
 server   = 'andrearivera.net'
 # CHANGE to YOUR database name, with a slash added as shown
