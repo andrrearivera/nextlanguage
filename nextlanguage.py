@@ -1,95 +1,100 @@
+import pymysql
 from flask import Flask, render_template, redirect, url_for, request
-from modules import convert_to_dict, make_ordinal
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import text
+from flask_bootstrap import Bootstrap5
 
-from flask_bootstrap import Bootstrap
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, CSRFProtect
 from wtforms import StringField, SubmitField, RadioField
-from wtforms.validators import InputRequired
+from wtforms.validators import DataRequired, Length, InputRequired
 
+# this variable, db, will be used for all SQLAlchemy commands
+db = SQLAlchemy()
+# create the app
 app = Flask(__name__)
+app.secret_key = 'tO$&!|0wkamvVia0?n$NqIRVWOG'
 
-# Flask-WTF requires an encryption key - the string can be anything
-app.config['SECRET_KEY'] = 'C9y@xBHDOf6l_uUE1r]c3DatbM)N1!'
+# Bootstrap-Flask requires this line
+bootstrap = Bootstrap5(app)
+# Flask-WTF requires this line
+csrf = CSRFProtect(app)
 
-# Flask-Bootstrap requires this line
-Bootstrap(app)
+# assumes you did not create a password for your database
+# and the database username is the default, 'root'
+# change if necessary
+username = 'andreari_kimchi'
+password = 'LoserLover1004'
+userpass = 'mysql+pymysql://' + username + ':' + password + '@'
+server   = 'andrearivera.net'
+# CHANGE to YOUR database name, with a slash added as shown
+dbname   = '/andreari_next-language'
 
-# create a list of dicts
-languages_list = convert_to_dict("languages.csv")
 
-# with Flask-WTF, each web form is represented by a class
-# "SearchForm" can change; "(FlaskForm)" cannot
-class SearchForm(FlaskForm):
-    # the choices are (value, label)
-    category = RadioField('Choose a detail to search:', validators=[InputRequired(message=None)], choices=[ ('language', 'Chinese'), ('language', 'Spanish'), ('language', 'English'), ('language', 'Hindi'), ('language', 'Arabic')] )
-    text = StringField('Type full or partial text to search for:', validators=[InputRequired(message=None)] )
-    submit = SubmitField('Search')
+# CHANGE NOTHING BELOW
+# put them all together as a string that shows SQLAlchemy where the database is
+app.config['SQLALCHEMY_DATABASE_URI'] = userpass + server + dbname
 
-# first route
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
-@app.route('/')
+# initialize the app with Flask-SQLAlchemy
+db.init_app(app)
+
+
+# NOTHING BELOW THIS LINE NEEDS TO CHANGE
+# this route will test the database connection - and nothing more
+
+
+class Language(db.Model):
+    __tablename__ = 'languages'
+    id = db.Column(db.Integer, primary_key=True)
+    language = db.Column(db.String)
+    family = db.Column(db.String)
+    branch = db.Column(db.String)
+    writing = db.Column(db.String)
+    speakers = db.Column(db.String)
+    countries = db.Column(db.String)
+    category = db.Column(db.String)
+    weeks = db.Column(db.String)
+    hours = db.Column(db.String)
+    audio = db.Column(db.String)
+
+class LangForm(FlaskForm):
+    lang = RadioField('What language do you speak?', choices=[(47,'Chinese (Mandarin)'), (16,'English'),(64,'Spanish'),(29,'Hindi'),(2,'Arabic')], validators=[InputRequired()])
+    #default=1, coerce=int,
+
+    sort = RadioField('Filter by:', choices=[('family','Language family'), ('branch','Language Branch'),('writing','Writing system')], validators=[InputRequired()])
+    submit = SubmitField('Submit')
+
+
+@app.route('/', methods=['GET'])
 def index():
-    ids_list = []
-    name_list = []
-    # fill one list with the number of each presidency and
-    # fill the other with the name of each president
-    for president in presidents_list:
-        ids_list.append(president['Presidency'])
-        name_list.append(president['President'])
-        # zip() is a built-in function that combines lists
-        # creating a new list of tuples
-    pairs_list = zip(ids_list, name_list)
-    # sort the list by the first item in each tuple, the number
-    # pairs_list_sorted = sorted(pairs_list, key=lambda tup: int(tup[0]))
-    return render_template('index.html', pairs=pairs_list, the_title="Presidents Index")
+    try:
+        form = LangForm()
+        return render_template('index.html',form=form)
 
-# second route
+    except Exception as e:
+        # e holds description of the error
+        error_text = "<p>The error:<br>" + str(e) + "</p>"
+        hed = '<h1>Something is broken.</h1>'
+        return hed + error_text
 
-@app.route('/president/<num>')
-def detail(num):
-    for president in presidents_list:
-        if president['Presidency'] == num:
-            pres_dict = president
-            break
-    # a little bonus function, imported
-    ord = make_ordinal( int(num) )
-    return render_template('president.html', pres=pres_dict, ord=ord, the_title=pres_dict['President'])
 
-# third route
 
-@app.route( '/search', methods=['GET', 'POST'] )
-def search():
-    # this is from the class above; form will go to the template
-    form = SearchForm()
-    message = ""
-    # make three empty lists
-    ids_list = []
-    name_list = []
-    pairs_list = []
-    if request.method == "POST":
-        # get the inputs from the form
-        category = request.form.get("category")
-        text = request.form.get("text")
+@app.route('/languages', methods=['POST'])
+def result():
+    lang_id = request.form['lang']
+    sort_id = request.form['sort']
 
-        # loop to find ALL presidents who match inputs
-        # but ONLY those who match
-        for president in presidents_list:
-            if text.lower() in president[category].lower():
-                ids_list.append(president['Presidency'])
-                name_list.append(president['President'])
 
-        pairs_list = zip(ids_list, name_list)
-        # the following is for cases where the search.html template is returned
-        message = "Sorry, no match was found."
-    # decide which route/template to use, based on search results
-    if len(ids_list) == 1:
-        return redirect( url_for('detail', num=ids_list[0] ) )
-    elif len(ids_list) > 0:
-        return render_template('index.html', pairs=pairs_list, the_title="Search Results")
-    else:
-        # the next return happens if method == "GET" or no match was found
-        return render_template('search.html', form=form, message=message)
 
-# keep this as is
+
+
+
+    return render_template('languages.html')
+
+
+
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=4999, debug=True)

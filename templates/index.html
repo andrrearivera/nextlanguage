@@ -1,0 +1,83 @@
+{% from 'bootstrap5/form.html' import render_form %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Next Language</title>
+  <!-- cdn -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+  <!--fonts-->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Nunito+Sans&display=swap" rel="stylesheet">
+  <style>
+    h1  {font-family:'Abril Fatface', arial, sans-serif;}
+    body {font-family:'Nunito Sans', arial, sans-serif;}
+  </style>
+  <!-- css -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+  <!-- AOS CSS -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+</head>
+
+
+
+<body>
+
+  <div class="container">
+
+<!-- top -->
+    <div class="row mt-5" id="top">
+      <div class="col-md-7 my-auto mx-auto">
+
+        <div class="header text-center">
+          <h1 class="text-primary"> Your Next Language:</h1>
+        </div>
+
+        <p class="text-center pt-2 mt-5"> There are over 7,000 languages spoken throughout the world. Some of them are very similar to each other, while others are incredibly different. Some of these languages are common worldwide, while others are very niche and near the point of extinction.</p>
+
+        <p class="text-center"> Language is how we share and communicate stories, information, and emotions; it can connect individuals from various backgrounds. While most individuals speak only one language, those who speak multiple have more ability to experience the world through different perspectives.</p>
+
+        <p class="text-center"> Learning a new language can be daunting; however, it is easier to learn a language similar to one you already speak. This application is meant to guide you to languages that share similarities to one you already know. You are able to pick from the top 5 most commonly spoken languages in the world, and pick a similarity you would like to sort by. </p>
+
+      </div>
+    </div>
+
+<!-- FORM -->
+        <div class="row mt-5">
+          <div class="col-md-7 my-auto mx-auto">
+
+
+          {% block content %}
+
+          <p> Pick one of the options below:  </p>
+
+          {{ render_form(form, action=url_for("result"), method="post") }}
+
+
+          {% endblock %}
+
+        </div>
+
+      </div>
+
+<!-- FOOTER -->
+    <footer>
+    <div class="row  text-center pt-5">
+      <div class="col-md-6 mx-auto">
+        <p class="text-muted text-center"> View my Github repo <a href="https://github.com/andrrearivera/nextlanguage">here</a>.</p>
+      </div>
+    </div>
+    </footer>
+    </div>
+
+  <!-- js cdn -->
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+  <!-- AOS -->
+      <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+      <script> AOS.init(); </script>
+
+</body>
+
+</html>
