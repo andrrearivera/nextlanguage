@@ -87,12 +87,7 @@ def result():
 
 
 
-
-
-
     return render_template('languages.html')
-
-
 
 
 
